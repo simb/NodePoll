@@ -26,7 +26,6 @@
 
 <div id="results">
     <h3>Poll Results:</h3>
-    <ol></ol>
     <div id="graph" class="graph" style="width: 500px; height: 300px;"></div>
 </div>
 
@@ -55,11 +54,6 @@
                     $('#poll').show();
 
                 } else if (msg.type === MESSAGE_TYPE_RESULTS) {
-                    var opts = $('#results ol').html('');
-                    for (var o in msg.options) {
-                        opts.append('<li>' + o + ': ' + msg.options[o] + '</li>')
-                    }
-
                     make_graph(msg.options);
                 }
             });
