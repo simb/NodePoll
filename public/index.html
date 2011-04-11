@@ -32,6 +32,8 @@
         var socket;
 
         $(function () {
+            $('#poll, #results').hide();
+            
             socket = new io.Socket(document.location.hostname, document.location.port);
             socket.connect();
             socket.on('connect', function() {
