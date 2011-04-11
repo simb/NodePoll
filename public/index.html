@@ -61,7 +61,7 @@
             });
 
             $('#poll ol li a').live('click', function () {
-                var i = this.attr('data-index');
+                var i = $(this).attr('data-index');
                 socket.send({
                     'type': MESSAGE_TYPE_VOTE,
                     'index': i
