@@ -1,0 +1,79 @@
+<html>
+
+<head>
+    <title>Node Polling</title>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
+    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+
+<h1>Node Polling</h1>
+<h5 id="status">Connecting to node polling server...</h5>
+
+<div id="empty">
+    <h3>Waiting to receive a question.</h3>
+</div>
+
+<div id="poll">
+    <h3></h3>
+    <ol></ol>
+</div>
+
+<div id="results">
+    <h3>Poll Results:</h3>
+    <ol></ol>
+</div>
+
+<script type="text/javascript">
+    (function ($, undefined) {
+        var MESSAGE_TYPE_QUESTION = 'question',
+            MESSAGE_TYPE_VOTE = 'vote',
+            MESSAGE_TYPE_RESULTS = 'results';
+        var socket;
+
+        $(function () {
+            socket = new io.Socket(document.location.hostname, document.location.port);
+            socket.connect();
+            socket.on('connect', function() {
+                $('#status').text("Connected to Node Polling server! Waiting for a question.");
+            });
+            socket.on('message', function(msg) {
+                if (msg.type === MESSAGE_TYPE_QUESTION) {
+                    $('#poll h3').text = msg.question;
+
+                    var opts = $('#poll ol').html('');
+                    msg.options.each(function (item, index) {
+                        opts.append('<li><a href="#" data-index="' + index + '">' + item + '</a></li>');
+                    });
+
+                    $('#empty, #results').hide();
+                    $('#poll').show();
+
+                } else if (msg.type === MESSAGE_TYPE_RESULTS) {
+                    var opts = $('#results ol').html('');
+                    msg.options.each(function (item, index) {
+                        opts.append('<li>' + item.val + ': ' + item.votes + '</li>')
+                    });
+                }
+            });
+            socket.on('disconnect', function() {
+                $('#status').text("Disconnected from Node Polling server, refresh to try reconnecting.");
+            });
+
+            $('#poll ol li a').live('click', function () {
+                var i = this.attr('data-index');
+                socket.send({
+                    'type': MESSAGE_TYPE_VOTE,
+                    'index': i
+                });
+
+                $('#poll').hide();
+                $('#results').show();
+            });
+        });
+
+    })(jQuery);
+</script>
+
+</body>
+</html>
