@@ -6,7 +6,7 @@ var express = require('express'),
 var server = express.createServer();
 
 server.configure( function(){
-	server.use(express.static(__dirname + '/public'));
+	server.use(express.staticProvider(__dirname + '/public'));
 })
 server.listen(8080);
 
