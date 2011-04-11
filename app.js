@@ -14,25 +14,38 @@ server.listen(8080);
 // socket.io 
 var socket = io.listen(server); 
 
-	var results;
+	var results,
+		question;
 	
   	// Add a connect listener
 	socket.on('connection', function(client){ 
-		
+		if ( question ) {
+			client.send(question);
+		}
 		
 	  // Success!  Now listen to messages to be received
 	  client.on('message',function(msg){ 
 		console.log(msg.type);
 	    if (msg.type === types.MESSAGE_TYPE_QUESTION) {
 		 	results = {};
+			question = msg;
 			console.log('Sending Question');
 			client.broadcast(msg);
+			for ( var i=0;i<msg.options.length;i++){
+				results[msg.options[i]] = 0;
+			}
+			var ans = {type:types.MESSAGE_TYPE_RESULTS, options: results};
+			client.broadcast(ans);
+			client.send(ans);
 		}
 		if (msg.type === types.MESSAGE_TYPE_VOTE) {
 			console.log('Sending Results');
-			console.log(msg);
+			//console.log(msg);
+			//results[msg.answer] = results[msg.answer] || 0;
 			results[msg.answer] += 1;
-			client.broadcast(results);
+			var ans = {type:types.MESSAGE_TYPE_RESULTS, options: results};
+			client.broadcast(ans);
+			client.send(ans);
 		}
 	
 		//console.log('Received message from client!',msg);
