@@ -51,8 +51,8 @@
 
                 } else if (msg.type === MESSAGE_TYPE_RESULTS) {
                     var opts = $('#results ol').html('');
-                    for ( var i = 0; i < msg.options.length; i++) {
-                        opts.append('<li>' + msg.options[i].val + ': ' + msg.options[i].votes + '</li>')
+                    for ( var o in msg.options) {
+                        opts.append('<li>' + o + ': ' + msg.options[o] + '</li>')
                     }
                 }
             });
