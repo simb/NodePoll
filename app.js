@@ -18,20 +18,17 @@ var socket = io.listen(server);
   	// Add a connect listener
 	socket.on('connection', function(client){ 
 		
-		var interval = setInterval(function() {
-		  client.send(	{type: types.MESSAGE_TYPE_QUESTION, 
-							question: "How are you?", 
-							answers: ["Great","Good","Fair","Poor"]
-						});
-			console.log('sending question');
-		},5000);
+		
 	  // Success!  Now listen to messages to be received
-	  client.on('message',function(event){ 
+	  client.on('message',function(msg){ 
+		console.log( msg, msg.type, types.MESSAGE_TYPE_QUESTION);
+		//client.send({type:"message",foo:"aaron"});
 	    if (msg.type === types.MESSAGE_TYPE_QUESTION) {
-			
+			console.log('Sending Question');
+			client.broadcast(msg);
 		}
 	
-		console.log('Received message from client!',event);
+		//console.log('Received message from client!',msg);
 		//client.send('Echo: ' + event );
 		//client.broadcast('Echo: ' + event );
 	  });
