@@ -42,18 +42,18 @@
                     $('#poll h3').text = msg.question;
 
                     var opts = $('#poll ol').html('');
-                    msg.options.each(function (item, index) {
-                        opts.append('<li><a href="#" data-index="' + index + '">' + item + '</a></li>');
-                    });
+                    for (var i=0; i < msg.options.length; i++) {
+                        opts.append('<li><a href="#" data-index="' + i + '">' + msg.options[i] + '</a></li>');
+                    }
 
                     $('#empty, #results').hide();
                     $('#poll').show();
 
                 } else if (msg.type === MESSAGE_TYPE_RESULTS) {
                     var opts = $('#results ol').html('');
-                    msg.options.each(function (item, index) {
-                        opts.append('<li>' + item.val + ': ' + item.votes + '</li>')
-                    });
+                    for ( var i = 0; i < msg.options.length; i++) {
+                        opts.append('<li>' + msg.options[i].val + ': ' + msg.options[i].votes + '</li>')
+                    }
                 }
             });
             socket.on('disconnect', function() {
