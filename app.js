@@ -1,6 +1,7 @@
 var express = require('express'),  
     io = require('socket.io'),
-	sys = require('sys');
+	sys = require('sys'),
+	types = require('./public/js/types');
 
 
 var server = express.createServer();
@@ -18,13 +19,21 @@ var socket = io.listen(server);
 	socket.on('connection', function(client){ 
 		
 		var interval = setInterval(function() {
-		  client.send('This is a message from the server!  ' + new Date().getTime());
+		  client.send(	{type: types.MESSAGE_TYPE_QUESTION, 
+							question: "How are you?", 
+							answers: ["Great","Good","Fair","Poor"]
+						});
+			console.log('sending question');
 		},5000);
 	  // Success!  Now listen to messages to be received
 	  client.on('message',function(event){ 
-	    console.log('Received message from client!',event);
-		client.send('Echo: ' + event );
-		client.broadcast('Echo: ' + event );
+	    if (msg.type === types.MESSAGE_TYPE_QUESTION) {
+			
+		}
+	
+		console.log('Received message from client!',event);
+		//client.send('Echo: ' + event );
+		//client.broadcast('Echo: ' + event );
 	  });
 	  client.on('disconnect',function(){
 	    //clearInterval(interval);
