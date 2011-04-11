@@ -61,10 +61,10 @@
             });
 
             $('#poll ol li a').live('click', function () {
-                var i = $(this).text();
+                var a = $(this).text();
                 socket.send({
                     'type': MESSAGE_TYPE_VOTE,
-                    'index': i
+                    'answer': a
                 });
 
                 $('#poll').hide();
