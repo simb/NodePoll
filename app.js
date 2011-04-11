@@ -40,20 +40,15 @@ var socket = io.listen(server);
 		}
 		if (msg.type === types.MESSAGE_TYPE_VOTE) {
 			console.log('Sending Results');
-			//console.log(msg);
-			//results[msg.answer] = results[msg.answer] || 0;
+			
 			results[msg.answer] += 1;
 			var ans = {type:types.MESSAGE_TYPE_RESULTS, options: results};
 			client.broadcast(ans);
 			client.send(ans);
 		}
 	
-		//console.log('Received message from client!',msg);
-		//client.send('Echo: ' + event );
-		//client.broadcast('Echo: ' + event );
 	  });
 	  client.on('disconnect',function(){
-	    //clearInterval(interval);
 	    console.log('Client has disconnected');
 	  });
 	
