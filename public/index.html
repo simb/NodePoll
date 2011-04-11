@@ -43,7 +43,7 @@
 
                     var opts = $('#poll ol').html('');
                     for (var i=0; i < msg.options.length; i++) {
-                        opts.append('<li><a href="#" data-index="' + i + '">' + msg.options[i] + '</a></li>');
+                        opts.append('<li><a href="#">' + msg.options[i] + '</a></li>');
                     }
 
                     $('#empty, #results').hide();
@@ -61,7 +61,7 @@
             });
 
             $('#poll ol li a').live('click', function () {
-                var i = $(this).attr('data-index');
+                var i = $(this).text();
                 socket.send({
                     'type': MESSAGE_TYPE_VOTE,
                     'index': i
