@@ -39,7 +39,7 @@
             });
             socket.on('message', function(msg) {
                 if (msg.type === MESSAGE_TYPE_QUESTION) {
-                    $('#poll h3').text = msg.question;
+                    $('#poll h3').text(msg.question);
 
                     var opts = $('#poll ol').html('');
                     for (var i=0; i < msg.options.length; i++) {
