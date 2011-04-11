@@ -5,6 +5,10 @@
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
     <script type="text/javascript" src="/socket.io/socket.io.js"></script>
     <script type="text/javascript" src="/js/types.js"></script>
+    <script type="text/javascript" src="/js/raphael.js"></script>
+    <script type="text/javascript" src="/js/jquery.enumerable.js"></script>
+    <script type="text/javascript" src="/js/jquery.tufte-graph.js"></script>
+    <link rel="stylesheet" href="/css/tufte-graph.css"/>
 </head>
 <body>
 
@@ -23,6 +27,7 @@
 <div id="results">
     <h3>Poll Results:</h3>
     <ol></ol>
+    <div id="graph" class="graph" style="width: 500px; height: 300px;"></div>
 </div>
 
 <script type="text/javascript">
@@ -31,7 +36,7 @@
 
         $(function () {
             $('#poll, #results').hide();
-            
+
             socket = new io.Socket(document.location.hostname, document.location.port);
             socket.connect();
             socket.on('connect', function() {
@@ -42,7 +47,7 @@
                     $('#poll h3').text(msg.question);
 
                     var opts = $('#poll ol').html('');
-                    for (var i=0; i < msg.options.length; i++) {
+                    for (var i = 0; i < msg.options.length; i++) {
                         opts.append('<li><a href="#">' + msg.options[i] + '</a></li>');
                     }
 
@@ -51,9 +56,11 @@
 
                 } else if (msg.type === MESSAGE_TYPE_RESULTS) {
                     var opts = $('#results ol').html('');
-                    for ( var o in msg.options) {
+                    for (var o in msg.options) {
                         opts.append('<li>' + o + ': ' + msg.options[o] + '</li>')
                     }
+
+                    make_graph(msg.options);
                 }
             });
             socket.on('disconnect', function() {
@@ -71,6 +78,42 @@
                 $('#results').show();
             });
         });
+
+        var make_graph = function (data) {
+            var graphData = [];
+
+            for (var l in data) {
+                graphData.push([data[l], {label:l}]);
+            }
+
+            $('#graph').tufteBar({
+                data: graphData,
+
+                // Any of the following properties can be either static values
+                // or a function that will be called for each data point.
+                // For functions, 'this' will be set to the current data element,
+                // just like jQuery's $.each
+
+                // Bar width in arbitrary units, 1.0 means the bars will be snuggled
+                // up next to each other
+                barWidth: 0.8,
+
+                // The label on top of the bar - can contain HTML
+                // formatNumber inserts commas as thousands separators in a number
+                barLabel:  function(index) {
+                    return $.tufteBar.formatNumber(this[0]);
+                },
+
+                // The label on the x-axis - can contain HTML
+                axisLabel: function(index) {
+                    return this[1].label
+                },
+
+                // Alternatively, you can just override the default colors and keep
+                // the built in color functions
+                colors: ['#82293B', '#E57536', '#FFBE33']
+            });
+        };
 
     })(jQuery);
 </script>
