@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" minWidth="955" minHeight="600" creationComplete="creationCompleteHandler(event)">
+	<s:layout>
+		<s:HorizontalLayout />
+	</s:layout>
+	<fx:Declarations>
+		<mx:SeriesInterpolate id="changeEffect" duration="500"/>
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.pnwrain.flashsocket.FlashSocket;
+			import com.pnwrain.flashsocket.events.FlashSocketEvent;
+			
+			import mx.collections.ArrayCollection;
+			import mx.events.FlexEvent;
+			
+			protected var socket:FlashSocket;
+			
+			[Bindable]
+			protected var answers:ArrayCollection = new ArrayCollection();
+			
+			
+			
+			protected function creationCompleteHandler(event:FlexEvent):void
+			{
+				socket = new FlashSocket("ws://localhost:8080/socket.io/flashsocket");
+				socket.addEventListener(FlashSocketEvent.CONNECT, onConnect);
+				socket.addEventListener(FlashSocketEvent.MESSAGE, onMessage);
+				socket.addEventListener(FlashSocketEvent.CLOSE, onDisconnect);
+			
+			}
+			protected function onConnect(event:FlashSocketEvent):void{
+				form.enabled = true;
+			}
+			protected function onDisconnect(event:FlashSocketEvent):void{
+				form.enabled = false;
+			}
+			protected function onMessage(event:FlashSocketEvent):void{
+				if ( event.data.type == "results" ){
+					answers.removeAll();
+					var results:Object =  event.data.options;
+					for ( var key:String in results){
+						answers.addItem({answer: key, count: results[key]});
+					}
+				}
+			}
+			
+			protected function send_clickHandler(event:MouseEvent):void
+			{
+				answers = new ArrayCollection();
+				var quiz:Object = {type :"question"};
+				quiz.question = question.text;
+				quiz.options = [a1.text, a2.text, a3.text, a4.text];
+				socket.send(quiz);	
+				
+			}
+			
+		]]>
+	</fx:Script>
+	<s:Form id="form" enabled="false">
+		<s:FormHeading label="Survey Form" />
+		<s:FormItem label="Question">
+			<s:TextInput id="question" width="300" text="How are you doing today?" />
+		</s:FormItem>
+		<s:FormItem label="Answer 1">
+			<s:TextInput id="a1" text="Great!" />
+		</s:FormItem>
+		<s:FormItem label="Answer 2">
+			<s:TextInput id="a2" text="Good" />
+		</s:FormItem>
+		<s:FormItem label="Answer 3">
+			<s:TextInput id="a3" text="Fair" />
+		</s:FormItem>
+		<s:FormItem label="Answer 4">
+			<s:TextInput id="a4" text="Poor" />
+		</s:FormItem>
+		<s:FormItem>
+			<s:Button label="Start Survey" click="send_clickHandler(event)" />
+		</s:FormItem>
+	</s:Form>
+	<s:VGroup>
+		
+		<mx:ColumnChart id="myChart" dataProvider="{answers}" showDataTips="true">
+			
+			<mx:horizontalAxis>
+				<mx:CategoryAxis 
+					dataProvider="{answers}" 
+					categoryField="answer"
+					/>
+			</mx:horizontalAxis>
+			<mx:series>
+				<mx:ColumnSeries showDataEffect="{changeEffect}"
+					xField="answer" 
+					yField="count" 
+					displayName="Votes"
+					/>
+				
+			</mx:series>
+		</mx:ColumnChart>
+	</s:VGroup>
+</s:Application>
